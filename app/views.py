@@ -8,6 +8,8 @@ from rest_framework.permissions import IsAuthenticated ,AllowAny
 from .permissions import IsSeller
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from rest_framework.decorators import api_view
+from django.contrib.auth import authenticate
 # Create your views here.
 def hello(request):
     return HttpResponse("Hello")
@@ -83,5 +85,20 @@ class orderViewset(generics.CreateAPIView):
 class ListOrders(generics.ListAPIView):
     queryset = OrderModel.objects.all()
     serializer_class = OrderSerializer
+
+
+
+
+@api_view(['POST'])
+def login_view(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+
+    user = authenticate(username=username,password=password)
+
+    if user is not None:
+        return Response({"message": "Authenticated successfully"}, status=status.HTTP_200_OK)
+    else:
+        return Response({"detail": "Invalid username/password"}, status=status.HTTP_401_UNAUTHORIZED)
         
         
